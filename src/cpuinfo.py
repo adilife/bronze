@@ -6,30 +6,31 @@
 #CPU time
 
 
-import psutil
 import time
-import os
+import cpu
+import logdata
+from common import DelLastChar
 
-class cpu(object):
-    #def __init__(self, *args, **kwargs):
-
-    def cpu_times(percpu=False):
-        return psutil.cpu_times(percpu)
-        #scputimes(user=3317.13, nice=0.21, system=1353.57, idle=52900.49, iowait=1207.56, irq=0.0, softirq=37.21,\
-        # steal=0.0, guest=0.0, guest_nice=0.0)
-
-    def cpu_percent(percpu=False,interval=1):
-        return psutil.cpu_percent(interval, percpu)
-
-
+#保存cputimes
 tuple_cpu_times=cpu.cpu_times()
-name="cpuinfo_"+time.strftime('%Y%m%d',time.localtime(time.time()))
+writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+", "+str(tuple_cpu_times)+"\n"
+logdata.writelog("cputimes", writestr)
 
+#保存 cpu percent
+tcc=cpu.cpu_percent(True)
+tcc.insert(0,cpu.cpu_percent())
 
+cn=cpu.cpu_name()
+cn.insert(0,"avage")
 
-with open('log/'+name,'ta',encoding='utf-8',errors='ignore') as f:
-    f.write("hel12lo\n")
-    f.close()
+pre_writestr=""
+for i in range(0,len(tcc)):
+    pre_writestr=pre_writestr+cn[i]+"="+str(tcc[i])+", "
+
+pre_writestr=DelLastChar(DelLastChar(pre_writestr))
+writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+", "+pre_writestr+"\n"
+logdata.writelog("cpupercent", writestr)
+
 
 
 

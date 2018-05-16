@@ -15,8 +15,7 @@ def writelog(logtype,writestr):
     if isinstance(logtype,str):
         if logtype in logtypelist():
             logname='log/'+logtype+"_"+time.strftime('%Y%m%d',time.localtime(time.time()))
-        else:
-            return
+        return
         
     if isinstance(writestr,str):
         #'log/' 输出文件保存路径

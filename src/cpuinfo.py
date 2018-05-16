@@ -7,29 +7,42 @@
 
 
 import time
-import cpu
-import logdata
-from common import DelLastChar
+import bronze_logdata
+import bronze_cpu
+
 
 #保存cputimes
-tuple_cpu_times=cpu.cpu_times()
-writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+", "+str(tuple_cpu_times)+"\n"
-logdata.writelog("cputimes", writestr)
+cpu_times=bronze_cpu.Cpu_times()
+pre_writestr=""
+pre_writestr=str(cpu_times.get())
+pre_writestr=pre_writestr[10:-1]
+writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+", "+pre_writestr+"\n"
+
+logdata=bronze_logdata.Logdata()
+logdata.set("cputimes",writestr)
+logdata.writelog()
 
 #保存 cpu percent
-tcc=cpu.cpu_percent(True)
-tcc.insert(0,cpu.cpu_percent())
+cpu_percent=bronze_cpu.Cpu_percent()
+tcc=cpu_percent.get()
+pc=0.0
+for i,u in enumerate(tcc):
+    pc+=int(u)
+    ac=pc/cpu_percent.cpu_count
+tcc.insert(0,ac)
 
-cn=cpu.cpu_name()
+cn=cpu_percent.cpu_name
 cn.insert(0,"avage")
 
 pre_writestr=""
-for i in range(0,len(tcc)):
-    pre_writestr=pre_writestr+cn[i]+"="+str(tcc[i])+", "
-
-pre_writestr=DelLastChar(DelLastChar(pre_writestr))
+for i,u in enumerate(tcc):
+    pre_writestr=pre_writestr+cn[i]+"="+str(u)+", "
+pre_writestr=pre_writestr[:-2]
 writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+", "+pre_writestr+"\n"
-logdata.writelog("cpupercent", writestr)
+
+logdata=bronze_logdata.Logdata()
+logdata.set("cpupercent",writestr)
+logdata.writelog()
 
 
 

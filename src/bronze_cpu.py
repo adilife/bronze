@@ -38,7 +38,7 @@ class Cpu(object):
 
     def __get_linux_cpu_base_info(self):
         #打开实际的 \proc\cpuinfo 文件需要用root用户运行
-        with open('cpuinfo','tr',errors='ignore') as cf:
+        with open(r'/proc/cpuinfo','tr',errors='ignore') as cf:
             for line in cf:
                 if line.startswith('cpu MHz'):
                     self.cpu_freq.append(float(line.split(':')[1].strip()))
@@ -66,8 +66,6 @@ class Cpu_times(Cpu):
         # steal=0.0, guest=0.0, guest_nice=0.0)
         self.cpu_times=psutil.cpu_times(percpu)
         return self.cpu_times
-
-
 
 
 

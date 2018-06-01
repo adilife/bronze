@@ -5,13 +5,14 @@
 
 
 import time
+from bronze_common import *
 
 class Logdata(object):
     def __init__(self):
         self.content=""
         self.logtype=""
-        self.__logtypelist=["cputimes","cpupercent","meminfo"]
-        self.logfilepath="log/"
+        self.__logtypelist=LOG_TYPE_LIST
+        self.logfilepath=CONFIG_LOG_DIR+"log/"
 
     def set(self,logtype,content):
         if logtype in self.__logtypelist:
@@ -32,4 +33,5 @@ class Logdata(object):
             myfile.write(self.content)
             myfile.close()
         return
+
 

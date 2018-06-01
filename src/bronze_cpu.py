@@ -13,6 +13,8 @@ class Cpu(object):
         self.cpu_name=[]
         self.cpu_model=[]
         self.cpu_freq=[]
+        self.cpu_vendor=""
+        self.cpu_cache_size=""
         
         self.__get()
 
@@ -44,6 +46,10 @@ class Cpu(object):
                     self.cpu_freq.append(float(line.split(':')[1].strip()))
                 if line.startswith('model name'):
                     self.cpu_model.append(line.split(':')[1].strip())
+                if line.startswith('vendor_id') and self.cpu_vendor=="":
+                    self.cpu_vendor=line.split(':')[1].strip()
+                if line.startswith('cache size') and self.cpu_cache_size=="":
+                    self.cpu_cache_size=line.split(':')[1].strip()
             cf.close()
         return
 
@@ -66,7 +72,6 @@ class Cpu_times(Cpu):
         # steal=0.0, guest=0.0, guest_nice=0.0)
         self.cpu_times=psutil.cpu_times(percpu)
         return self.cpu_times
-
 
 
 

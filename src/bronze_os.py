@@ -4,6 +4,7 @@
 #This file is a part of project Bronze.
 
 '''
+class OSinfo: OS_version, OS_kernel_version, OS_hostname, OS_system, OS_architecture, OS_machine, OS_processor
 class OSusers: baseinfo{"uid":"name"}, homedir{"uid":"homedir"}, shell{"uid":"shell"}, primegroup{"uid":"gid"}
         __get() #初始化信息
 
@@ -37,7 +38,6 @@ class OSinfo(object):
 
     def __get(self):
         self.__get_osinfo()
-        self.__get_userinfo()
         return
     
     def __get_osinfo(self):
@@ -45,28 +45,17 @@ class OSinfo(object):
         self.OS_system=tmp_osinfo[0]
         self.OS_hostname=tmp_osinfo[1]
         self.OS_kernel_version=tmp_osinfo[2]
-        self.OS_version=tmp_osinfo[3]
+        self.OS_version=tmp_osinfo[3][1:]
         self.OS_machine=tmp_osinfo[4]
         self.OS_processor=tmp_osinfo[5]
-        self.OS_architecture=platform.architecture()
+        self.OS_architecture=str(platform.architecture())
         return
-    
-    def __get_userinfo(self):
-        __sysstr = platform.system()
-        if __sysstr == "Linux":
-            self.__get_linux_userinfo()
 
-        return
-    
-    def __get_linux_userinfo(self):
-        pass
-        return
-    
     def print_info(self):
-        print(" OS_SYSTEM: %s \n OS_VERSION: %s \n OS_KERNEL_VERSION: %s \n OS_HOSTNAME: %s \n" \
-              % (a.OS_system,a.OS_version,a.OS_kernel_version,a.OS_hostname))
-        print(" OS_MACHINE: %s \n OS_PROCESSOR: %s \n OS_ARCHITECTURE: %s \n" \
-              %(a.OS_machine,a.OS_processor,a.OS_architecture))
+        print("OS_SYSTEM: %s \nOS_VERSION: %s \nOS_KERNEL_VERSION: %s \nOS_HOSTNAME: %s" \
+              % (self.OS_system,self.OS_version,self.OS_kernel_version,self.OS_hostname))
+        print("OS_MACHINE: %s \nOS_PROCESSOR: %s \nOS_ARCHITECTURE: %s \n" \
+              %(self.OS_machine,self.OS_processor,self.OS_architecture))
         return
 
 
@@ -80,13 +69,11 @@ class OSusers(object):
         self.__get()
     
     def __get(self):
-        __sysstr = platform.system()
-        if __sysstr == "Linux":
-            self.__get_linux_info()
+        self.__get_info()
         
         return
         
-    def __get_linux_info(self):
+    def __get_info(self):
         with open(r'/etc/passwd','tr',errors='ignore') as cf:
             fc=[]
             for line in cf:
@@ -106,7 +93,7 @@ class OSusers(object):
         print("HOMEDIR: %s" % self.homedir)
         print("SHELL: %s" % self.shell)
         print("PRIMEGROUP: %s" % self.primegroup)
-        
+        print()
         return
 
 
@@ -118,12 +105,10 @@ class OSgroups(object):
         self.__get()
     
     def __get(self):
-        __sysstr = platform.system()
-        if __sysstr == "Linux":
-            self.__get_linux_info()
+        self.__get_info()
         return
 
-    def __get_linux_info(self):
+    def __get_info(self):
         with open(r'/etc/group','tr',errors='ignore') as cf:
             fc=[]
             us=OSusers()
@@ -146,65 +131,183 @@ class OSgroups(object):
     def print_info(self):
         print("GROUPS: %s" % self.baseinfo)
         print("MEMBERS: %s" % self.member)
+        print()
         return
 
-def user_info(self,uid="", name=""):
-    pass
-    return
-
-#未测试
 def group_info(gid="", name=""):
     us=OSusers()
     gs=OSgroups()
     ginfo=("",)
+    tmp_name=""
+    tmp_member=""
+    tmp_gid=""
     if gid != "" and name == "":
-        tmp_name=gs.baseinfo[gid]
-        tmp_member=gs.member[gid]
+        try:
+            tmp_name=gs.baseinfo[gid]
+        except:
+            pass
+        try:
+            tmp_member=gs.member[gid]
+        except:
+            pass
+        
         tmp_gid=gid
-
-    if gid == "" and name != "":
-        tmp_gid=""
+        
+    elif gid == "" and name != "":
+        tmp_gid=gid
         for tt in enumerate(gs.baseinfo.items()):
             if tt[1][1] == name:
                 tmp_gid=tt[1][0]
-        tmp_member=gs.member[tmp_gid]
+                tmp_name=name
+
+        try:
+            tmp_member=gs.member[tmp_gid]
+        except:
+            pass
+        
+    elif gid == "" and name == "":
+        pass
+    
+    else :
         tmp_name=name
-    
-    for tt in enumerate(us.baseinfo.items()):
-        if tmp_name == tt[1][1]:
-            if tmp_member != "":
-                tmp_member=tmp_name+","+tmp_member
-            tmp_member=tmp_name
+        tmp_gid=gid
+        if tmp_name != gs.baseinfo[gid]:
+            tmp_name=""
+            tmp_gid=""
+            tmp_member=""
+        else:
+            for tt in enumerate(us.baseinfo.items()):
+                if tmp_name == tt[1][1]:
+                    if tmp_member != "":
+                        tmp_member=tmp_name+","+tmp_member
+                    tmp_member=tmp_name
+
     ginfo=(tmp_gid,tmp_name,tmp_member)
-    
     return ginfo
 
-def user_group(uid=""):
+#返回给定用户的组信息, return (("gid","gname"),)
+def user_group(uid="",name=""):
     gids=[]
     tmp_gids=[]
-    user_name=""
+    tmp_name=""
+    tmp_uid=""
     us=OSusers()
     gs=OSgroups()
-    if uid!="":
+    
+    if uid != "" and name == "" :
         for tt in enumerate(us.baseinfo.items()):
             if uid == tt[1][0]:
-                user_name=tt[1][1]
-        for tt in enumerate(gs.member.items()):
-            if user_name in tt[1][1]:
-                tmp_gids.append(tt[1][0])
-        for tg in enumerate(tmp_gids):
-            tgn=gs.baseinfo[tg[1]]
-            gids.append(tuple([tg[1],tgn]))
+                tmp_name=tt[1][1]
+        if tmp_name != "":
+            for tt in enumerate(gs.member.items()):
+                if tmp_name in tt[1][1]:
+                    tmp_gids.append(tt[1][0])
+            for tg in enumerate(tmp_gids):
+                tgn=gs.baseinfo[tg[1]]
+                gids.append(tuple([tg[1],tgn]))
+    
+    elif uid == "" and name != "" :
+        for tt in enumerate(us.baseinfo.items()):
+            if name == tt[1][1]:
+                tmp_name=name
+        if tmp_name != "":
+            for tt in enumerate(gs.member.items()):
+                if tmp_name in tt[1][1]:
+                    tmp_gids.append(tt[1][0])
+            for tg in enumerate(tmp_gids):
+                tgn=gs.baseinfo[tg[1]]
+                gids.append(tuple([tg[1],tgn]))
+
+    elif uid != "" and name != "" :
+        for tt in enumerate(us.baseinfo.items()):
+            if name == tt[1][1]:
+                if uid == tt[1][0]:
+                    tmp_name=name
+        if tmp_name != "":
+            for tt in enumerate(gs.member.items()):
+                if tmp_name in tt[1][1]:
+                    tmp_gids.append(tt[1][0])
+            for tg in enumerate(tmp_gids):
+                tgn=gs.baseinfo[tg[1]]
+                gids.append(tuple([tg[1],tgn]))
+
+    else :
+        pass
 
     return tuple(gids)
 
+# 返回用户信息,return (uid,name,homedir,shell,prime_group_id)
+def user_info(uid="", name=""):
+    tmp_uid=""
+    tmp_name=""
+    tmp_homedir=""
+    tmp_shell=""
+    tmp_prime_group_id=""
+    uinfo=[]
+    gs=OSgroups()
+    us=OSusers()
+
+    if uid=="" and name != "":
+        for tt in enumerate(us.baseinfo.items()):
+            if name == tt[1][1]:
+                tmp_uid=tt[1][0]
+                tmp_name=name
+        try:
+            tmp_homedir=us.homedir[tmp_uid]
+        except:
+            pass
+        try:
+            tmp_shell=us.shell[tmp_uid]
+        except:
+            pass           
+        try:
+            tmp_prime_group_id=us.primegroup[tmp_uid]
+        except:
+            pass           
+    
+    elif uid != "" and name == "":
+        for tt in enumerate(us.baseinfo.items()):
+            if uid == tt[1][0]:
+                tmp_name=tt[1][1]
+                tmp_uid=uid
+        try:
+            tmp_homedir=us.homedir[tmp_uid]
+        except:
+            pass
+        try:
+            tmp_shell=us.shell[tmp_uid]
+        except:
+            pass           
+        try:
+            tmp_prime_group_id=us.primegroup[tmp_uid]
+        except:
+            pass
+            
+    #参数全空
+    elif uid == "" and name == "":
+        pass
+    else:
+        for tt in enumerate(us.baseinfo.items()):
+            if uid == tt[1][0]:
+                if name == tt[1][1]:
+                    tmp_name=name
+                    tmp_uid=uid
+        try:
+            tmp_homedir=us.homedir[tmp_uid]
+        except:
+            pass
+        try:
+            tmp_shell=us.shell[tmp_uid]
+        except:
+            pass           
+        try:
+            tmp_prime_group_id=us.primegroup[tmp_uid]
+        except:
+            pass
+
+    uinfo=[tmp_uid,tmp_name,tmp_homedir,tmp_shell,tmp_prime_group_id]
+    return tuple(uinfo)
 
 
-a=OSinfo()
-a.print_info()
-b=OSusers()
-b.print_info()
-c=OSgroups()
-c.print_info()
 
-print(user_group("1000"))
+

@@ -31,23 +31,23 @@ def main(argv):
     if opts==[] :
         print("no args,default write logs")
         __write_log()
-    
+        
     #命令行参数处理
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            __usage()
-            exit()
-        elif opt in ("-w", "--write"):
-            print("write argv")
-            __write_log()
-        elif opt in ("-s", "--show"):
-            show_argv = arg
-            __show_info(show_argv)
-            exit()
-        elif opt in ("-l", "--logfile"):
-            log_file = arg
-            print("logfile")
-
+    else:
+        for opt, arg in opts:
+            if opt in ("-h", "--help"):
+                __usage()
+                exit()
+            elif opt in ("-w", "--write"):
+                print("write argv")
+                __write_log()
+            elif opt in ("-s", "--show"):
+                show_argv = arg
+                __show_info(show_argv)
+                exit()
+            elif opt in ("-l", "--logfile"):
+                log_file = arg
+                print("logfile")
 
 def __write_log():
     #保存cputimes
@@ -132,7 +132,6 @@ def __show_info(st):
 if __name__ == "__main__" :
     check_platform(PLATFORM) #监测运行平台是否符合要求
     main(sys.argv[1:])
-    print("运行成功")
 
 
 

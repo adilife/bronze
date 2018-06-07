@@ -88,6 +88,7 @@ usage cpuinfo.py [-hswl | --help --write --show <[cpu_times|times]|[cpu_percent|
 -h/--help 打印帮助信息
 无参数/-w/--write 保存LOG文件
 -s/--show 只显示信息，不保存
+    cpuinfo 显示CPU信息
     cpu_times | times 显示cpu times信息
     cpu_percent | percent 显示 cpu percent信息
 -l/-logfile = 指定日志存储位置, 未完成
@@ -96,7 +97,19 @@ usage cpuinfo.py [-hswl | --help --write --show <[cpu_times|times]|[cpu_percent|
 
 def __show_info(st):
     #show cpu_times
-    if st=="cpu_times" or st == "times" :
+    if st == "cpuinfo" :
+        ci=bronze_cpu.Cpu()
+        infostr='''
+Cpu Count  = %d
+Cpu Name   = %s
+cpu Model  = %s
+Cpu Freq   = %s
+Cpu Vendor = %s
+Cpu Cache  = %s
+'''
+        print(infostr % (ci.cpu_count,str(ci.cpu_name),ci.cpu_model[0],ci.cpu_freq[0],ci.cpu_vendor,ci.cpu_cache_size))
+    
+    elif st=="cpu_times" or st == "times" :
         cpu_times=bronze_cpu.Cpu_times()
         pre_writestr=""
         pre_writestr=str(cpu_times.get())

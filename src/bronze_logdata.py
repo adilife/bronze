@@ -33,7 +33,7 @@ class Logdata(object):
             with open(logname,'ta',encoding='utf-8',errors='ignore') as myfile:
                 myfile.write(self.content)
                 myfile.close()
-        elif self.logtype == "osinfo":
+        elif self.logtype in ["osinfo","meminfo"]:
             #只生成1个文件
             logname=self.logfilepath+self.logtype
             with open(logname,'tw',encoding='utf-8',errors='ignore') as myfile:

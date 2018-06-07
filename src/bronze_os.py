@@ -17,7 +17,7 @@ class OSgroups: baseinfo{"gid":"name"}, member{"uid":"member"}
 
 user_info(uid="",name="") # 返回用户信息,return (uid,name,homedir,shell,prime_group_id)
 group_info(gid="",name="") #返回组信息, return (gid,name,members)
-user_group(uid="") #返回给定用户的组信息, return (("gid","gname"),)
+user_group(uid="",name=“”) #返回给定用户的组信息, return (("gid","gname"),)
 
 '''
 

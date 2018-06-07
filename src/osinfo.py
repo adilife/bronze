@@ -10,7 +10,6 @@ import sys, getopt
 import bronze_logdata
 import bronze_os
 from bronze_common import *
-from asyncore import write
 
 #处理命令行参数 -h/--help 打印帮助信息，-w/--write 保存LOG文件，-s/--show 只显示信息，不保存, -l/-logfile = 指定日志存储位置
 def main(argv):

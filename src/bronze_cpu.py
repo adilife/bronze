@@ -31,14 +31,6 @@ class Cpu(object):
 
     def __get_cpu_base_info(self):
         self.__get_cpu_name()
-        
-        __sysstr = platform.system()
-        if __sysstr == "Linux":
-            self.__get_linux_cpu_base_info()
-
-        return
-
-    def __get_linux_cpu_base_info(self):
         #打开实际的 \proc\cpuinfo 文件需要用root用户运行
         with open(r'/proc/cpuinfo','tr',errors='ignore') as cf:
             for line in cf:
@@ -50,7 +42,7 @@ class Cpu(object):
                     self.cpu_vendor=line.split(':')[1].strip()
                 if line.startswith('cache size') and self.cpu_cache_size=="":
                     self.cpu_cache_size=line.split(':')[1].strip()
-            cf.close()
+            cf.close()        
         return
 
 class Cpu_percent(Cpu):

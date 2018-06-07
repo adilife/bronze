@@ -27,13 +27,13 @@ class Logdata(object):
         return
 
     def __writelog_file(self):
-        if self.logtype in ["cputimes","cpupercent"]:
+        if self.logtype == "cpuinfo":
             #文件名按找日期生成，作为本地缓冲存储
             logname=self.logfilepath+self.logtype+"_"+time.strftime('%Y%m%d',time.localtime(time.time()))
             with open(logname,'ta',encoding='utf-8',errors='ignore') as myfile:
                 myfile.write(self.content)
                 myfile.close()
-        elif self.logtype in ["osinfo"]:
+        elif self.logtype == "osinfo":
             #只生成1个文件
             logname=self.logfilepath+self.logtype
             with open(logname,'tw',encoding='utf-8',errors='ignore') as myfile:

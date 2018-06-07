@@ -55,12 +55,8 @@ def __write_log():
     pre_writestr=""
     pre_writestr=str(cpu_times.get())
     pre_writestr=pre_writestr[10:-1]
-    writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# "+pre_writestr+"\n"
-    
-    logdata=bronze_logdata.Logdata()
-    logdata.set("cputimes",writestr)
-    logdata.writelog()
-    
+    cputimes_writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# cputimes# "+pre_writestr+"\n"
+
     #保存 cpu percent
     cpu_percent=bronze_cpu.Cpu_percent()
     tcc=cpu_percent.get()
@@ -77,10 +73,11 @@ def __write_log():
     for i,u in enumerate(tcc):
         pre_writestr=pre_writestr+cn[i]+"="+str(u)+", "
     pre_writestr=pre_writestr[:-2]
-    writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# "+pre_writestr+"\n"
-    
+    cpupercent_writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# cpupercent# "+pre_writestr+"\n"
+
+    writestr=cputimes_writestr+cpupercent_writestr 
     logdata=bronze_logdata.Logdata()
-    logdata.set("cpupercent",writestr)
+    logdata.set("cpuinfo",writestr)
     logdata.writelog()
 
 def __usage():

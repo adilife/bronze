@@ -5,7 +5,7 @@
 
 
 import time
-from bronze_common import *
+from bronze_lib.bronze_common import *
 
 class Logdata(object):
     def __init__(self):

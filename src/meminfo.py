@@ -7,9 +7,9 @@ import time
 import sys, getopt
 
 #import bronze mod
-import bronze_mem
-import bronze_logdata
-from bronze_common import *
+import bronze_lib.bronze_mem
+import bronze_lib.bronze_logdata
+from bronze_lib.bronze_common import *
 
 
 def main(argv):
@@ -82,7 +82,7 @@ def __show_info(st):
     GB=1024*1024
 
     prt_str=""
-    mi=bronze_mem.Mem()
+    mi=bronze_lib.bronze_mem.Mem()
 
     if st == "h" :
         #show in human friendly
@@ -114,18 +114,17 @@ def __show_info(st):
         for k,v in enumerate(mi.allinfo):
             print("{:13s} =  {} GB".format(v[0],str(round(int(v[1])/GB))))    
 
-    
     return
 
 def __write_log():
     #保存meminfo
-    mi=bronze_mem.Mem()
+    mi=bronze_lib.bronze_mem.Mem()
     mi_pre_writestr=""
     for k,v in enumerate(mi.allinfo):
         mi_pre_writestr += "{:12s} =  {}\n".format(v[0],v[1])
     
     writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# meminfo\n"+mi_pre_writestr+"\n"
-    logdata=bronze_logdata.Logdata()
+    logdata=bronze_lib.bronze_logdata.Logdata()
     logdata.set("meminfo",writestr)
     logdata.writelog()
 

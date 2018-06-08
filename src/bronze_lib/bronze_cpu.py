@@ -52,7 +52,7 @@ class Cpu_percent(Cpu):
 
     def get(self, percpu=True, interval=1):
         self.cpu_percent=psutil.cpu_percent(interval, percpu)
-        return
+        return self.cpu_percent
 
 class Cpu_times(Cpu):
     def __init__(self):
@@ -63,7 +63,7 @@ class Cpu_times(Cpu):
         #scputimes(user=3317.13, nice=0.21, system=1353.57, idle=52900.49, iowait=1207.56, irq=0.0, softirq=37.21,\
         # steal=0.0, guest=0.0, guest_nice=0.0)
         self.cpu_times=psutil.cpu_times(percpu)
-        return
+        return self.cpu_times
 
 
 

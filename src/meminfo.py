@@ -11,13 +11,30 @@ import bronze_lib.bronze_mem
 import bronze_lib.bronze_logdata
 from bronze_lib.bronze_common import *
 
+MEM_DMI_DETAIL=\
+'''
+          5   Memory Controller
+          6   Memory Module
+         16   Physical Memory Array
+         17   Memory Device
+         18   32-bit Memory Error
+         19   Memory Array Mapped Address
+         20   Memory Device Mapped Address
+         37   Memory Channel
+'''
+
+MEM_DMI_TYPE=\
+'''
+       memory      5, 6, 16, 17
+'''
+
 
 def main(argv):
     log_file = ''
     show_argv = ''
     
     try:
-        opts, args = getopt.getopt(argv,"hkmgswl:",["help","write","show","logfile="])
+        opts, args = getopt.getopt(argv,"hkmgswl:d:",["help","write","show","logfile=","dev="])
     except getopt.GetoptError:
         print("wrong args!")
         __usage()
@@ -43,6 +60,8 @@ def main(argv):
             elif opt in ("-l", "--logfile"):
                 log_file = arg
                 print("logfile")
+            elif opt in ("-d", "--dev"):
+                __show_dev(arg)
             elif opt == "-h":
                 __show_info("h")
                 exit()
@@ -62,7 +81,7 @@ def main(argv):
 def __usage():
     usage_content=\
 '''
-usage meminfo.py [-hkmgswl | --help --write --show --logfile path_name]
+usage meminfo.py [-hkmgswld | --help --write --show --logfile=path_name --dev=devname]
 
 --help 打印帮助信息
 -h 人类友好信息显示
@@ -71,7 +90,8 @@ usage meminfo.py [-hkmgswl | --help --write --show --logfile path_name]
 -g GB为单位显示
 -w/--write 保存LOG文件
 无参数/-s/--show 只显示信息，不保存
--l/-logfile = 指定日志存储位置, 未完成
+-l/--logfile = 指定日志存储位置, 未完成
+-d/--dev = devname []
 '''
     print(usage_content)
     return
@@ -129,6 +149,9 @@ def __write_log():
     logdata.writelog()
 
     return
+
+def __show_dev(dv):
+    print("show dev")
 
 
 if __name__ == "__main__" :

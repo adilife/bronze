@@ -71,6 +71,31 @@ DMI类型定义
 from subprocess import Popen, PIPE
 
 
+
+#定义DMI TYPE
+BIOS=[b"0,",b"13,"]
+SYSTEM=[b"1,", b"12,", b"15,", b"23,", b"32,"]
+BASEBOARD=[b"2,",b"10,"]
+CHASSIS=[b"3,"]
+PROCESSOR=[b"4,"]
+MEMORY=[b"5,",b"6,",b"16,",b"17,"]
+CACHE=[b"7,"]
+CONNECTOR=[b"8,"]
+SLOT=[b"9,"]
+DETAIL_TYPE={'BIOS': b'0,', 'System': b'1,', 'Base Board': b'2,', 'Chassis': b'3,', \
+         'Processor': b'4,', 'Memory Controller': b'5,', 'Memory Module': b'6,', \
+         'Cache': b'7,', 'Port Connector': b'8,', 'System Slots': b'9,', 'On Board Devices': b'10,', \
+         'OEM Strings': b'11,', 'System Configuration Options': b'12,', 'BIOS Language': b'13,', \
+         'Group Associations': b'14,', 'System Event Log': b'15,', 'Physical Memory Array': b'16,', \
+         'Memory Device': b'17,', '32-bit Memory Error': b'18,', 'Memory Array Mapped Address': b'19,', \
+         'Memory Device Mapped Address': b'20,', 'Built-in Pointing Device': b'21,', 'Portable Battery': b'22,', \
+         'System Reset': b'23,', 'Hardware Security': b'24,', 'System Power Controls': b'25,', 'Voltage Probe': b'26,', \
+         'Cooling Device': b'27,', 'Temperature Probe': b'28,', 'Electrical Current Probe': b'29,', \
+         'Out-of-band Remote Access': b'30,', 'Boot Integrity Services': b'31,', 'System Boot': b'32,', \
+         '64-bit Memory Error': b'33,', 'Management Device': b'34,', 'Management Device Component': b'35,', \
+         'Management Device Threshold Data': b'36,', 'Memory Channel': b'37,', 'IPMI Device': b'38,', \
+         'Power Supply': b'39,'}
+
 class Dmi(object):
 
     def __init__(self):
@@ -112,7 +137,7 @@ class Dmi(object):
                 #print(tmp_data)
                 #print(dmitype)
                 istype=True
-            
+
             if istype:
                 if tmp_data[0] == b"" :
                     istype = False

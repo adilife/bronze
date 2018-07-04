@@ -126,17 +126,35 @@ def main(argv):
 
 def __show_type(st):
     di=dmi.Dmi()
-    dt="di.parse_data("+st.upper()+")"
-    m,n=eval(dt)
+    dt=compile("di.parse_data(%s)" % st.upper(), "", "eval")
+    try:
+        m,n=eval(dt)
+    except NameError as e:
+        print("Wrong Type!")
+        __usage()
+        return
+
     for k,v in enumerate(m):
-        print(k,v)
+        try:
+            print(k,v)
+        except BrokenPipeError as e:
+            return
+        except KeyboardInterrupt as e:
+            return
+    return
 
 def __show_subtype(st):
     di=dmi.Dmi()
     dt=(st+",").encode("ascii")
     m,n=di.parse_data(dt)
     for k,v in enumerate(m):
-        print(k,v)
+        try:
+            print(k,v)
+        except BrokenPipeError as e:
+            return
+        except KeyboardInterrupt as e:
+            return
+    return
 
 def __usage():
     usage_content=\

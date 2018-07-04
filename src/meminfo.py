@@ -9,6 +9,7 @@ import sys, getopt
 #import bronze mod
 import bronze_lib.bronze_mem
 import bronze_lib.bronze_logdata
+import bronze_lib.bronze_dmi as dmi
 from bronze_lib.bronze_common import *
 
 MEM_DMI_DETAIL=\
@@ -34,7 +35,7 @@ def main(argv):
     show_argv = ''
     
     try:
-        opts, args = getopt.getopt(argv,"hkmgswl:d:",["help","write","show","logfile=","dev="])
+        opts, args = getopt.getopt(argv,"hkmgswl:d",["help","write","show","logfile=","dev"])
     except getopt.GetoptError:
         print("wrong args!")
         __usage()
@@ -61,7 +62,7 @@ def main(argv):
                 log_file = arg
                 print("logfile")
             elif opt in ("-d", "--dev"):
-                __show_dev(arg)
+                __show_dev()
             elif opt == "-h":
                 __show_info("h")
                 exit()
@@ -91,7 +92,7 @@ usage meminfo.py [-hkmgswld | --help --write --show --logfile=path_name --dev=de
 -w/--write 保存LOG文件
 无参数/-s/--show 只显示信息，不保存
 -l/--logfile = 指定日志存储位置, 未完成
--d/--dev = devname []
+-d/--dev 显示内存硬件信息
 '''
     print(usage_content)
     return
@@ -142,7 +143,7 @@ def __write_log():
     mi_pre_writestr=""
     for k,v in enumerate(mi.allinfo):
         mi_pre_writestr += "{:12s} =  {}\n".format(v[0],v[1])
-    
+
     writestr=str(time.strftime("%Y-%m-%d %X",time.localtime()))+"# meminfo\n"+mi_pre_writestr+"\n"
     logdata=bronze_lib.bronze_logdata.Logdata()
     logdata.set("meminfo",writestr)
@@ -150,8 +151,98 @@ def __write_log():
 
     return
 
-def __show_dev(dv):
+def __show_dev():
     print("show dev")
+    dv=dmi.Dmi()
+    controller,bin_controller=dv.parse_data(dmi.DETAIL_TYPE['Memory Controller'])
+    module,bin_module=dv.parse_data(dmi.DETAIL_TYPE['Memory Module'])
+    controller_data=__parse_mem_controller(controller)
+    module_data=__parse_mem_module(module)
+    
+    #print Controller data
+    print("\nMemory Controller Info:")
+    for k,v in enumerate(controller_data):
+        print("{:27s}: {}".format(v[0],v[1]))
+
+    #print Module data
+    print("\nMemory Module Info:")
+    flag_stop=False
+    prt_str_l1=""
+    prt_str_l2=""
+    prt_str=""
+    for k,v in enumerate(module_data):
+        for k,v in enumerate(v):
+            if v[0] == 'Socket Designation':
+                #print("{}{}:".format(v[0],v[1]))
+                prt_str_l1 += "{}{}:\n".format(v[0],v[1])
+            else:
+                #print("{:20s}:{}".format(v[0],v[1]))
+                prt_str_l2 += "{:27s}: {}\n".format(v[0],v[1])
+                if v[1]=='Not Installed':
+                    flag_stop=True
+                    prt_str_l1=''
+                    prt_str_l2=''
+                    break
+        if flag_stop:
+            break
+        else :
+            prt_str += prt_str_l1 + prt_str_l2
+            prt_str_l1=""
+            prt_str_l2=""
+    print(prt_str)
+    return
+
+def __parse_mem_module(module):
+    module_data=[]
+    module_template=['Socket Designation', 'Current Speed', 'Type', 'Installed Size', 'Enabled Size', 'Error Status']
+    tmp_parse=[]
+    islevel1=False
+    islevel2=False
+    flag_append=0
+    for id,line in enumerate(module):
+        if line.startswith("\t"):
+            islevel2 = True
+            islevel1 = False
+        else :
+            islevel1 = True
+            islevel2 = False
+
+        if islevel1 :
+            flag_append += 1
+
+        if  flag_append == 2:
+            module_data.append(tuple(tmp_parse))
+            flag_append = 0
+            tmp_parse=[]
+        
+        if islevel2 :
+            tmp_str=line.strip().split(": ")
+            tmp_parse.append(tuple(tmp_str))
+        
+    module_data.pop(0)
+    return tuple(tuple(module_data))
+
+def __parse_mem_controller(controller):
+    controller_data=[]
+    tmp_parse=[]
+    controller_template=['Supported Interleave', 'Current Interleave', \
+                         'Maximum Memory Module Size', 'Maximum Total Memory Size', \
+                         'Memory Module Voltage', 'Associated Memory Slots']
+
+    for id,line in enumerate(controller):
+        if line.startswith("\t\t"):
+            continue
+        elif line.startswith("\t"):
+            tmp_parse.append(line.strip().split(": "))
+        else:
+            continue
+
+    for k,v in enumerate(tmp_parse):
+        if v[0] in controller_template:
+            controller_data.append((v[0],v[1]))
+
+    return tuple(controller_data)
+
 
 
 if __name__ == "__main__" :

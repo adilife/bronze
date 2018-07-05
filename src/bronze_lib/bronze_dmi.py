@@ -109,7 +109,6 @@ class Dmi(object):
         return
     
     def __get_dmidecode(self):
-        data=[]
         p = Popen('dmidecode',shell=True,stdout=PIPE, stderr=PIPE).stdout.read().split(b"\n")
         return tuple(p)
 
